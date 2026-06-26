@@ -1,0 +1,82 @@
+# =============================================================================
+# DeepScan — .gitignore
+# =============================================================================
+# This project is a TEMPLATE. When pushed to GitHub, only the immutable
+# layer is committed. The results layer (repos/) is excluded because it
+# contains project-specific findings, tickets, and analysis data.
+#
+# To start a new DeepScan project:
+#   1. Clone this repository
+#   2. Update deepscan.config.json with your repos and GitHub Project
+#   3. Run: do review
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# RESULTS LAYER — never commit (project-specific data)
+# -----------------------------------------------------------------------------
+repos/*/analysis.md
+repos/*/findings.md
+repos/*/verification.md
+repos/*/tickets.md
+repos/*/plan.md
+repos/*/delta.md
+repos/_index.md
+
+# Keep the repos/ folder structure in git but not the contents
+# The folder itself is created on first review run
+repos/
+
+# -----------------------------------------------------------------------------
+# SENSITIVE FILES — never commit
+# -----------------------------------------------------------------------------
+
+# Real config contains project IDs and org details — keep local
+deepscan.config.json
+
+# MCP config may contain tokens
+.mcp.json
+.claude/mcp.json
+
+# Claude config
+.claude/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.production
+*.pem
+*.key
+
+# -----------------------------------------------------------------------------
+# OS FILES
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# -----------------------------------------------------------------------------
+# EDITOR FILES
+# -----------------------------------------------------------------------------
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Keep VS Code extension recommendations if any
+!.vscode/extensions.json
+
+# -----------------------------------------------------------------------------
+# LOGS AND TEMP
+# -----------------------------------------------------------------------------
+*.log
+tmp/
+temp/
+.tmp/

@@ -1,0 +1,52 @@
+{
+  "deepscan": {
+    "version": "1.0",
+    "trigger": "manual",
+    "model": "claude-sonnet-4-6"
+  },
+
+  "github_project": {
+    "org": "your-github-username-or-org",
+    "project_id": "PVT_REPLACE_WITH_YOURS",
+    "project_number": 1,
+    "project_name": "Your Project Board Name",
+    "project_url": "https://github.com/users/your-username/projects/1",
+    "default_column": "Backlog"
+  },
+
+  "repositories": [
+    {
+      "name": "your-repo-name",
+      "github_url": "https://github.com/your-username/your-repo-name",
+      "stack": ["Language", "Framework", "Database"]
+    },
+    {
+      "name": "another-repo-name",
+      "github_url": "https://github.com/your-username/another-repo-name",
+      "stack": ["Language", "Framework", "Database"]
+    }
+  ],
+
+  "global_excluded_paths": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "*.min.js",
+    "*.generated.*",
+    "__pycache__/",
+    ".env*",
+    "vendor/",
+    "migrations/",
+    "*.lock",
+    "*.snap",
+    "coverage/",
+    ".nyc_output/"
+  ],
+
+  "ticket_rules": {
+    "critical": { "create_ticket": true, "delay_weeks": 0 },
+    "high": { "create_ticket": true, "delay_weeks": 0 },
+    "medium": { "create_ticket": true, "delay_weeks": 0 },
+    "low": { "create_ticket": true, "delay_weeks": 0 }
+  }
+}
