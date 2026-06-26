@@ -249,3 +249,23 @@ For each violation found, record:
 - [ ] Static assets served without compression
 
 **Expected behavior:** Enable gzip/Brotli compression at the server or reverse proxy level. Compress all text-based responses over 1KB. Verify with `Content-Encoding: gzip` in response headers.
+
+---
+
+## 8. Cross-File Performance Patterns (requires full repository read)
+
+### 8.1 Duplicated Expensive Operations Across Files
+- [ ] Same expensive database query written in multiple service files instead of shared
+- [ ] Same external API call made in multiple places without a shared cached service
+- [ ] Same data transformation repeated in 5 different files instead of a shared utility
+- [ ] Each file instantiating its own HTTP client or DB connection instead of sharing one
+
+**Expected behavior:** Any operation that is expensive (DB query, external API call, complex computation) and needed in more than one place must be abstracted into a shared service with caching. One shared instance of HTTP clients and DB connections — never one per file.
+
+### 8.2 No Consistent Caching Strategy
+- [ ] Some services cache their results, others don't — with no clear rule about what should be cached
+- [ ] Some caches use Redis, others use in-memory objects, others use files — with no standard
+- [ ] Cache TTLs set arbitrarily in each file with no central policy
+- [ ] Some responses have cache headers, most don't — no consistent HTTP caching policy
+
+**Expected behavior:** Define a caching strategy for the project: what gets cached, where (Redis vs in-memory), and for how long (TTL policy by data type). Apply consistently. Centralize cache key generation to avoid collisions across files.

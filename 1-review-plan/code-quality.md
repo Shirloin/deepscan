@@ -300,3 +300,120 @@ For each violation found, record:
 - [ ] Missing `await` on async function calls
 
 **Expected behavior:** Use `async/await` consistently. Never use synchronous I/O in request handlers. Handle all promise rejections. Use worker threads for CPU-intensive operations.
+
+---
+
+## 10. File and Directory Structure
+
+### 10.1 Wrong File in Wrong Folder
+- [ ] A service file placed inside a `components/` folder
+- [ ] A utility function inside a `pages/` or `routes/` folder
+- [ ] A database model inside a `controllers/` folder
+- [ ] Test files mixed inside source folders with no clear separation
+- [ ] Configuration files scattered across multiple directories
+
+**Expected behavior:** Every file should live in a folder that matches its responsibility. Controllers in `controllers/`, services in `services/`, models in `models/`, utilities in `utils/` or `lib/`. For feature-based structures: `features/<name>/components/`, `features/<name>/services/`. A developer should be able to find any file by knowing its type and domain without searching.
+
+### 10.2 No Feature or Domain Grouping
+- [ ] All files of the same type in one flat folder regardless of domain (`components/UserCard.jsx`, `components/ProductCard.jsx`, `components/OrderTable.jsx` all flat)
+- [ ] Growing codebase with 50+ files in one directory
+- [ ] No clear way to find all files related to one feature
+- [ ] Cross-feature dependencies making it impossible to isolate features
+
+**Expected behavior:** Group by feature or domain at the top level, then by type within each feature. `features/auth/`, `features/checkout/`, `features/user-profile/`. Each feature folder is self-contained with its own components, hooks, services, tests. Shared utilities go in `shared/` or `common/`.
+
+### 10.3 Inconsistent File Naming
+- [ ] Mix of `camelCase.js`, `PascalCase.js`, and `kebab-case.js` for the same type of file
+- [ ] Component files not matching their exported component name (`userCard.jsx` exporting `UserCard`)
+- [ ] Test files using mixed conventions (`user.test.js`, `userSpec.js`, `test_user.py`)
+- [ ] Index files named inconsistently (`index.js` in some folders, `main.js` in others)
+- [ ] Files named after their type rather than their purpose (`helper.js`, `utils.js`, `service.js` with no domain prefix)
+
+**Expected behavior:** Pick one file naming convention and apply it everywhere per file type. Components: `PascalCase.tsx`. Utilities: `camelCase.ts` or `kebab-case.ts`. Tests: `<filename>.test.ts` or `<filename>.spec.ts` matching the source file name exactly. Enforce via linter configuration.
+
+### 10.4 Bloated Index Files
+- [ ] `index.js` containing actual business logic instead of just re-exports
+- [ ] A single index file that imports and re-exports hundreds of items
+- [ ] Index files containing conditional logic or side effects on import
+
+**Expected behavior:** Index files should only re-export. `export { UserService } from './UserService'`. Never put logic in index files. If an index file is doing too much, the folder structure needs to be rethought.
+
+### 10.5 Dead Files
+- [ ] Files that exist in the codebase but are never imported anywhere
+- [ ] Old feature folders left after a feature was removed
+- [ ] Duplicate files with slightly different names (`UserService.js` and `userService_old.js`)
+- [ ] Generated files committed to source control that should be in `.gitignore`
+
+**Expected behavior:** Delete unused files — version control preserves history. Regularly audit for unreferenced files. Add generated files (`dist/`, `build/`, `*.generated.*`) to `.gitignore`.
+
+---
+
+## 11. Duplicate and Near-Duplicate Constants
+
+### 11.1 Same Value, Different Names
+- [ ] `MAX_RETRY = 3` in one file and `RETRY_LIMIT = 3` in another file
+- [ ] `API_TIMEOUT = 5000` and `REQUEST_TIMEOUT = 5000` defined separately
+- [ ] `STATUS_ACTIVE = 'active'` and `USER_STATUS_ACTIVE = 'active'` in different modules
+- [ ] Same error message string defined multiple times with minor wording differences
+
+**Expected behavior:** One name, one place for every constant. Cross-file constants belong in a shared `constants/` module. If two constants have different names but the same value and purpose, they are the same constant — consolidate them.
+
+### 11.2 ENV Variables Read in Multiple Places
+- [ ] `process.env.DATABASE_URL` read in 5 different files
+- [ ] `os.environ['API_KEY']` scattered across multiple service files
+- [ ] No central config module — each file reads env vars directly
+- [ ] Same env var read with different fallback values in different files
+
+**Expected behavior:** Read all environment variables once in a single config module (`config/index.js`, `config.py`, `application.properties`). Export typed, validated config values. Every other file imports from config — never reads `process.env` directly. This ensures: one place to add validation, one place to see all config, consistent fallback behavior.
+
+### 11.3 Magic Numbers and Strings Repeated
+- [ ] The number `86400` (seconds in a day) appearing in 3+ files without a named constant
+- [ ] HTTP status codes written as raw numbers (`200`, `404`, `500`) throughout the codebase
+- [ ] The same role string `'admin'` or `'superuser'` repeated in every authorization check
+- [ ] Same regex pattern defined multiple times across different files
+
+**Expected behavior:** Every magic number or string that appears more than once must be a named constant. Group related constants together: `HTTP_STATUS`, `USER_ROLES`, `TIME_CONSTANTS`. Import from the constants file everywhere.
+
+---
+
+## 12. Spaghetti Code Patterns
+
+### 12.1 Mixed Abstraction Levels
+- [ ] A function that mixes high-level orchestration with low-level implementation detail in the same body
+- [ ] Calling `sendEmail()` (high level) and then manually constructing the SMTP socket (low level) in the same function
+- [ ] Business rule logic mixed with raw SQL string construction in one function
+- [ ] A React component that manages routing logic, API calls, form state, and renders JSX all at once
+
+**Expected behavior:** Each function should operate at one level of abstraction. High-level functions call other functions — they don't implement detail. Low-level functions do one specific thing. If you read a function and some lines read like a story ("get user, validate order, process payment") while others read like implementation ("split string by comma, iterate array, check index"), the abstraction levels are mixed. Extract the implementation detail into named functions.
+
+### 12.2 No Clear Entry Point or Flow
+- [ ] Hard to determine where a feature starts executing
+- [ ] Logic spread across 5+ files with no clear orchestration point
+- [ ] Event handlers triggering other event handlers in a chain with no central coordinator
+- [ ] Side effects triggered implicitly through module imports
+
+**Expected behavior:** Every feature should have a clear entry point — one function or one module that orchestrates the flow. The flow should be readable top-to-bottom. Side effects should be explicit, not triggered by import order. A new developer should be able to find the entry point and trace the full flow without jumping across 10 unrelated files.
+
+### 12.3 Tangled Control Flow
+- [ ] A function with 3+ early returns caused by unrelated concerns mixed together
+- [ ] `if/else` chains that handle both validation AND business logic AND formatting in the same block
+- [ ] Exception handling used for normal control flow (throwing exceptions instead of returning values)
+- [ ] Boolean variables set in one place and checked 50 lines later with no clear connection
+
+**Expected behavior:** Separate concerns before combining them. Validate first (return early on invalid). Then execute business logic. Then format and return. Each phase in a named function. Use return values or result types for control flow — not exceptions. Keep the distance between a variable being set and being used as short as possible.
+
+### 12.4 Function as a Dumping Ground
+- [ ] A function that started small and grew to 200+ lines by adding edge cases over time
+- [ ] A function with 15+ local variables
+- [ ] A function that contains its own mini-algorithm that could be a separate named function
+- [ ] A function where removing any one section would not affect the others (unrelated code co-located)
+
+**Expected behavior:** Functions should be cohesive — every line should contribute to one clear purpose. If you can read a function and describe what it does without using the word "and", it has good cohesion. If the description is "it validates the input AND saves to the database AND sends a notification AND logs the action", it should be 4 functions.
+
+### 12.5 Implicit Dependencies and Hidden State
+- [ ] Functions relying on global variables being set before they are called
+- [ ] Module-level state mutated from multiple places with no clear ownership
+- [ ] Functions that work differently based on the order they are called
+- [ ] Side effects not obvious from a function's signature (function named `getUser` that also increments a counter)
+
+**Expected behavior:** Functions should declare their dependencies explicitly as parameters. Avoid module-level mutable state. If a function has side effects, name it accordingly (`fetchAndCacheUser` not `getUser`). Output should depend only on input — not on external state that may or may not be set.

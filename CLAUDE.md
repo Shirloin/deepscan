@@ -69,10 +69,68 @@ Follow this sequence top to bottom on every run. Do not skip steps.
   Purpose: understand what already exists before the review starts.
   This prevents duplicate findings and duplicate tickets.
 
-── STEP 4: ANALYZE (GitHub MCP — read only) ──────────────────────────
-  Read repository files via GitHub MCP
-  Skip all paths in excluded-paths.md and deepscan.config.json exclusions
-  Apply all 4 checklists from 1-review-plan/
+── STEP 4: READ THE FULL REPOSITORY (GitHub MCP — read only) ─────────
+
+  PHASE 1 — MAP THE ENTIRE REPOSITORY (do this before reading any file)
+
+  1. Get the complete recursive file tree of the entire repository
+     Use GitHub MCP to list ALL files and directories from the root
+     Do not sample — get every file path
+
+  2. Filter out excluded paths from:
+     - 2-config/excluded-paths.md
+     - global_excluded_paths in deepscan.config.json
+
+  3. What remains is your FULL READ LIST — every source file must be read
+
+  PHASE 2 — READ EVERY FILE IN THE FULL READ LIST
+
+  Read files in this order (most likely to contain findings first):
+    a) Entry points — main files, app bootstraps, index files, server files
+    b) Route and controller files — all of them
+    c) Service and business logic files — all of them
+    d) Data access and repository files — all of them
+    e) Auth and middleware files — all of them
+    f) Configuration files — all of them
+    g) Utility and helper files — all of them
+    h) Component files (frontend) — all of them
+    i) Hook and store files (frontend) — all of them
+    j) Test files — all of them (to understand coverage gaps)
+    k) Remaining source files — all of them
+
+  CRITICAL RULES FOR READING:
+  - Read EVERY file in the full read list — no file limit, no sampling
+  - Do not stop reading when you think you have "enough context"
+  - Do not skip files because they seem unimportant
+  - Cross-file issues (duplicate constants, inconsistent patterns,
+    spaghetti dependencies) can ONLY be found by reading every file
+  - If a repository has 200 files, read all 200
+
+  WHAT TO BUILD WHILE READING:
+  While reading, maintain a running mental model of:
+  - Directory structure and whether it follows a clear pattern
+  - File naming conventions and whether they are consistent
+  - Constants and values defined — watch for duplicates across files
+  - Which patterns are used (are they consistent across the codebase?)
+  - Dependencies between files — who imports what
+  - Any value, string, or logic that appears in more than one file
+
+  PHASE 3 — APPLY ALL CHECKLISTS AGAINST THE FULL PICTURE
+
+  Only after reading EVERY file, apply all checklists from 1-review-plan/:
+  - 1-review-plan/code-quality.md
+  - 1-review-plan/security.md
+  - 1-review-plan/architecture.md
+  - 1-review-plan/performance.md
+
+  Pay special attention to cross-file sections in each checklist:
+  - Duplicate constants across files (Section 11 in code-quality.md)
+  - Spaghetti patterns (Section 12 in code-quality.md)
+  - File and directory structure (Section 10 in code-quality.md)
+  - Inconsistent patterns across the codebase (Section 8 in architecture.md)
+  - Cross-file security gaps (Section 11 in security.md)
+  - Cross-file performance patterns (Section 8 in performance.md)
+
   Build finding candidates: file, line, dimension, issue type, severity
 
 ── STEP 5: RECONCILE FINDINGS ────────────────────────────────────────
@@ -203,6 +261,20 @@ For each repo, open `repos/<repo-name>/verification.md`.
 Apply `2-config/verification-rules.md` to each pending finding.
 For confirmed findings, run the full duplicate check then create tickets.
 For refuted findings, move to false-positives in findings.md.
+
+### "re-review `<repo-name>`"
+Re-run a full review on a repository that has already been reviewed.
+Use this when the review plan has been updated or you want a fresh analysis.
+
+Differences from a normal review:
+- Read every file in the repository — same full two-phase approach
+- Compare new findings against existing findings.md
+- For findings that match existing ones: update Last Seen date only
+- For findings that are new: assign new IDs and create tickets
+- For findings from previous run not detected this run: mark as candidates for resolved
+- When checking for duplicate tickets: match on file + issue type (not dimension)
+  because the updated review plan may have recategorized some findings
+- Update analysis.md, findings.md, delta.md with full new results
 
 ### "show status"
 Read `repos/_index.md` and all `repos/<repo-name>/analysis.md` files.

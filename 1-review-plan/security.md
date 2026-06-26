@@ -312,3 +312,29 @@ For each violation found, record:
 - [ ] Feature flags checked only on the frontend
 
 **Expected behavior:** All access control must be enforced server-side. Frontend hiding of UI is UX only — never security. Assume users can and will access any URL or API endpoint directly.
+
+---
+
+## 11. Cross-File Security Patterns (requires full repository read)
+
+### 11.1 Inconsistent Auth Enforcement
+- [ ] Some routes have auth middleware, others don't — with no clear rule about which should
+- [ ] Auth check implemented differently in different parts of the codebase (JWT in one place, session in another)
+- [ ] Some controllers check permissions, others assume the middleware already did it
+- [ ] Middleware applied inconsistently across route groups
+
+**Expected behavior:** Auth enforcement must be consistent and centralized. Use middleware applied at the router level. Every route that requires auth should be under an auth-protected router group. Audit the full route list to confirm no endpoint is accidentally unprotected.
+
+### 11.2 Secret Patterns Across Files
+- [ ] Same secret or credential used in multiple files (copied, not imported from one source)
+- [ ] Different files using different methods to access the same secret (`process.env.KEY` in some, hardcoded in others)
+- [ ] Secrets passed as function parameters through multiple call layers instead of read from config once
+
+**Expected behavior:** Every secret read once in the config module. Never pass secrets as function parameters — inject via config or dependency injection. Audit all files for string patterns that look like secrets.
+
+### 11.3 Input Validation Coverage Gaps
+- [ ] Validation applied on some endpoints but missing on endpoints added later
+- [ ] Consistent validation on POST/PUT endpoints but missing on DELETE or GET with query params
+- [ ] Validation in the controller but missing in internal service methods that are also called directly
+
+**Expected behavior:** Validate at every entry point — HTTP endpoints, message queue consumers, cron job inputs, CLI arguments. Internal service methods that can be called from multiple places should also validate their inputs. Audit all entry points across the full codebase.

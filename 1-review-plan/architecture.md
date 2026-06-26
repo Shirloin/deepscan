@@ -217,3 +217,30 @@ For each violation found, record:
 - [ ] No documentation of required environment variables
 
 **Expected behavior:** Validate all required config at startup. If any required config is missing, fail fast with a clear error listing what's missing. Use a schema for config validation (Joi, Zod, Pydantic Settings). Document all required and optional env vars.
+
+---
+
+## 8. Cross-File Architecture Patterns (requires full repository read)
+
+### 8.1 Inconsistent Layer Usage Across the Codebase
+- [ ] Some features follow controller → service → repository pattern, others bypass layers entirely
+- [ ] Some modules use dependency injection, others instantiate dependencies directly
+- [ ] Inconsistent error handling patterns — some use try/catch, others use error middleware, others ignore errors
+- [ ] Some endpoints return paginated responses, others return unbounded lists
+
+**Expected behavior:** Architecture patterns must be applied consistently across the entire codebase, not just in some features. If a pattern is the right one for the project, it should be everywhere. Inconsistency is a sign that the pattern was added later and older code was never updated — both the old and new code should be audited and aligned.
+
+### 8.2 Scattered Configuration
+- [ ] Application config spread across `config.js`, `settings.py`, `constants.js`, and individual service files
+- [ ] No single place to see all configuration options for the application
+- [ ] Some config from env vars, some hardcoded, some from a config file — mixed with no rule
+
+**Expected behavior:** All config in one place, one pattern. A single `config/` module reads all env vars, provides typed defaults, validates required values at startup, and exports a single config object. Every other module imports from config — never reads env vars or hardcoded values directly.
+
+### 8.3 Missing or Inconsistent Abstractions
+- [ ] Direct HTTP client calls (`axios.get`, `fetch`) scattered across 10 service files with no shared wrapper
+- [ ] Third-party library imported directly in 8 different modules — switching libraries requires 8 changes
+- [ ] Some services have a retry/timeout wrapper, most don't
+- [ ] Logging called differently in different parts of the codebase
+
+**Expected behavior:** Every external dependency that is used in more than one place should be wrapped in a project-specific abstraction. `httpClient.get()` not `axios.get()` everywhere. `logger.info()` from one shared logger instance, not re-instantiated per file. One change to the wrapper fixes behavior everywhere.
