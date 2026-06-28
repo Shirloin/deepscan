@@ -7,7 +7,7 @@ Update the counters after every run. Never reuse a retired ID.
 
 | Abbreviation | Repository Name | Next Critical | Next High | Next Medium | Next Low |
 |---|---|---|---|---|---|
-| BEB | backend-easy-buy | C02 | H05 | M09 | L03 |
+| BEB | backend-easy-buy | C02 | H05 | M10 | L03 |
 | FEB | frontend-easy-buy | C01 | H01 | M06 | L03 |
 
 > Add one row per repository. Derive abbreviation from repo name:
@@ -33,6 +33,7 @@ Update the counters after every run. Never reuse a retired ID.
 | BEB-M08 | backend-easy-buy | Medium | N+1 sequential writes in createTransaction | 2026-06-26 | Active (ticketed) |
 | BEB-L01 | backend-easy-buy | Low | 50mb request body limit | 2026-06-26 | Active (ticketed) |
 | BEB-L02 | backend-easy-buy | Low | createTransaction guard-order bug | 2026-06-26 | Active (ticketed) |
+| BEB-M09 | backend-easy-buy | Medium | No HTTP security-headers middleware (helmet not used) | 2026-06-28 | Active (ticketed #24) |
 | FEB-M01 | frontend-easy-buy | Medium | JWT stored in localStorage (XSS token theft) | 2026-06-26 | Active (ticketed) |
 | FEB-M02 | frontend-easy-buy | Medium | Auth header placed in request body, not sent (ProductService) | 2026-06-26 | Active (ticketed) |
 | FEB-M03 | frontend-easy-buy | Medium | No centralized axios client / inconsistent auth attachment | 2026-06-26 | Active (ticketed) |

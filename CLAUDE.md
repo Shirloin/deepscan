@@ -52,10 +52,30 @@ Follow this sequence top to bottom on every run. Do not skip steps.
 
 ── STEP 2: READ RULES (before touching any code) ─────────────────────
   1-review-plan/_index.md           → severity definitions, score formula
-  1-review-plan/code-quality.md     → code quality checklist
-  1-review-plan/security.md         → security checklist
-  1-review-plan/architecture.md     → architecture checklist
-  1-review-plan/performance.md      → performance checklist
+
+  Always read the base checklists:
+  1-review-plan/code-quality/_base.md
+  1-review-plan/security/_base.md
+  1-review-plan/architecture/_base.md
+  1-review-plan/performance/_base.md
+
+  Then identify the tech stack from the repository's config files:
+  - package.json, requirements.txt, pom.xml, go.mod, composer.json
+  - Look for: React, Angular, Next.js, Vue, Express, NestJS,
+    Spring Boot, Django, FastAPI, Laravel, Gin, Flask
+
+  Then read the matching tech-stack files for each stack found:
+  1-review-plan/code-quality/<stack>.md
+  1-review-plan/security/<stack>.md
+  1-review-plan/architecture/<stack>.md
+  1-review-plan/performance/<stack>.md
+
+  If the repository uses multiple stacks (e.g. Next.js frontend +
+  NestJS backend), read ALL matching files for ALL stacks found.
+
+  If no matching stack file exists, use only the _base.md files.
+
+  Also read:
   2-config/finding-id-registry.md   → current ID counters for this repo
   2-config/ticket-rules.md          → duplicate check, issue format, labels
   2-config/verification-rules.md    → what confirms or refutes a finding
@@ -117,19 +137,21 @@ Follow this sequence top to bottom on every run. Do not skip steps.
 
   PHASE 3 — APPLY ALL CHECKLISTS AGAINST THE FULL PICTURE
 
-  Only after reading EVERY file, apply all checklists from 1-review-plan/:
-  - 1-review-plan/code-quality.md
-  - 1-review-plan/security.md
-  - 1-review-plan/architecture.md
-  - 1-review-plan/performance.md
+  Only after reading EVERY file, apply all checklists from 1-review-plan/.
+  For each dimension apply BOTH the base checklist AND the matching
+  tech-stack file(s) detected in Step 2:
+  - 1-review-plan/code-quality/_base.md  + code-quality/<stack>.md
+  - 1-review-plan/security/_base.md      + security/<stack>.md
+  - 1-review-plan/architecture/_base.md  + architecture/<stack>.md
+  - 1-review-plan/performance/_base.md   + performance/<stack>.md
 
-  Pay special attention to cross-file sections in each checklist:
-  - Duplicate constants across files (Section 11 in code-quality.md)
-  - Spaghetti patterns (Section 12 in code-quality.md)
-  - File and directory structure (Section 10 in code-quality.md)
-  - Inconsistent patterns across the codebase (Section 8 in architecture.md)
-  - Cross-file security gaps (Section 11 in security.md)
-  - Cross-file performance patterns (Section 8 in performance.md)
+  Pay special attention to cross-file sections in each base checklist:
+  - Duplicate constants across files (Section 11 in code-quality/_base.md)
+  - Spaghetti patterns (Section 12 in code-quality/_base.md)
+  - File and directory structure (Section 10 in code-quality/_base.md)
+  - Inconsistent patterns across the codebase (Section 8 in architecture/_base.md)
+  - Cross-file security gaps (Section 11 in security/_base.md)
+  - Cross-file performance patterns (Section 8 in performance/_base.md)
 
   Build finding candidates: file, line, dimension, issue type, severity
 
